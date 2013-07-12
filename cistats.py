@@ -63,6 +63,6 @@ repos = {
 }
 repos_order = ['main', 'crew', 'mine']
 
+app.jinja_env.filters['timedelta'] = timesince
 if __name__ == '__main__':
-    app.jinja_env.filters['timedelta'] = timesince
     app.run(debug=True)
