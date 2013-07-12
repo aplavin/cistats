@@ -3,6 +3,7 @@ import hglib
 from datetime import datetime
 
 app = Flask(__name__)
+hglib.HGPATH = '/usr/local/bin/hg'
 
 
 def timesince(value, default="just now"):
