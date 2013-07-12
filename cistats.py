@@ -31,8 +31,8 @@ class Repo(object):
 
 
 def get_commits(repo, user):
-    client = hglib.open(repo.path)
-    revs = client.log(user=user)
+    with hglib.open(repo.path) as client:
+        revs = client.log(user=user)
     return [{'desc': r[5], 'dt': r[6], 'hash': r[1]} for r in revs]
 
 
