@@ -1,0 +1,34 @@
+{% macro show_commits(repo_id, desc) %}
+    <h3>Repo: <a href="{{ repos[repo_id].url }}">{{ repo_id }}</a></h3>
+    <p>{{ desc }}.</p>
+    <ul>
+        {% for commit in commits[repo_id] %}
+            <li>
+                <a href="{{ repos[repo_id].url }}/rev/{{ commit.hash }}">{{ commit.desc.splitlines()[0] }}</a> ({{ commit.dt | timedelta }})
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+    </style>
+    <title>My Mercurial commits</title>
+</head>
+<body>
+<h2>Mercurial commits authored by me (Alexander Plavin)</h2>
+<hr/>
+{{ show_commits('main', 'All commits accepted to the main Mercurial repo') }}
+<hr/>
+{{ show_commits('crew', 'Commits accepted to the crew repo, but not to the main one') }}
+<hr/>
+{{ show_commits('mine', 'Not accepted yet commits, some of them are draft and temporary') }}
+<hr/>
+</body>
+</html>
