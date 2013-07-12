@@ -65,4 +65,4 @@ repos_order = ['main', 'crew', 'mine']
 
 app.jinja_env.filters['timedelta'] = timesince
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
