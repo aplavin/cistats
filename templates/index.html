@@ -1,5 +1,15 @@
+{% macro show_ci_num(num) %}
+    {% if num == 0 %}
+        no commits
+    {% elif num == 1 %}
+        1 commit
+    {% else %}
+        {{ num }} commits
+    {% endif %}
+{% endmacro %}
+
 {% macro show_commits(repo_id, desc) %}
-    <h3>Repo: <a href="{{ repos[repo_id].url }}">{{ repo_id }}</a></h3>
+    <h3>Repo <a href="{{ repos[repo_id].url }}">{{ repo_id }}</a>: {{ show_ci_num(commits[repo_id]|length) }}</h3>
     <p>{{ desc }}.</p>
     <ul>
         {% for commit in commits[repo_id] %}
