@@ -8,16 +8,22 @@
     {% endif %}
 {% endmacro %}
 
-{% macro show_commits(repo_id, desc) %}
-    <h3>Repo <a href="{{ repos[repo_id].url }}">{{ repo_id }}</a>: {{ show_ci_num(commits[repo_id]|length) }}</h3>
-    <p>{{ desc }}.</p>
-    <ul>
-        {% for commit in commits[repo_id] %}
-            <li>
-                <a href="{{ repos[repo_id].url }}/rev/{{ commit.hash }}">{{ commit.desc.splitlines()[0] }}</a> ({{ commit.dt | timedelta }})
-            </li>
-        {% endfor %}
-    </ul>
+{% macro label_class(repo) %}
+    {% if repo == 'main' %}
+        label-success
+    {% elif repo == 'crew' %}
+        label-info
+    {% elif repo == 'pbomb' %}
+        label-warning
+    {% endif %}
+{% endmacro %}
+
+{% macro show_cirepos(cirepos) %}
+    {% for repo, hash in cirepos if repo != 'mine' %}
+        <a class="label {{ label_class(repo) }}" href="{{ repos[repo].url if repo in repos else '' }}/rev/{{ hash }}">{{ repo }}</a>
+    {% else %}
+        <span class="label label-default">none</span>
+    {% endfor %}
 {% endmacro %}
 
 <!DOCTYPE html>
@@ -32,13 +38,28 @@
     <title>My Mercurial commits</title>
 </head>
 <body>
+
 <h2>Mercurial commits authored by me (Alexander Plavin)</h2>
 <hr/>
-{{ show_commits('main', 'All commits accepted to the main Mercurial repo') }}
+
+<h3>Legend</h3>
+<span class="label label-success">main</span> accepted to the main Mercurial repo &mdash; {{ show_ci_num(commit_cnts['main']) }}<br/>
+<span class="label label-info">crew</span> accepted to the crew repo &mdash; {{ show_ci_num(commit_cnts['crew']) }}<br/>
+<span class="label label-warning">pbomb</span> patchbombed ('New' state) &mdash; {{ show_ci_num(commit_cnts['pbomb']) }}<br/>
+<span class="label label-default">none</span> other &mdash; {{ show_ci_num(commit_cnts['not_accepted']) }}<br/>
+Total: {{ show_ci_num(commit_cnts['mine']) }}
 <hr/>
-{{ show_commits('crew', 'Commits accepted to the crew repo, but not to the main one') }}
+
+<ul>
+    {% for commit, cirepos in commits %}
+        <li>
+            {{ show_cirepos(cirepos) }}
+            <a href="{{ repos['mine'].url }}/rev/{{ commit.hash }}">{{ commit.desc.splitlines()[0] }}</a>
+            ({{ commit.dt | timedelta }})
+        </li>
+    {% endfor %}
+</ul>
 <hr/>
-{{ show_commits('mine', 'Not accepted yet commits, some of them are draft and temporary') }}
-<hr/>
+
 </body>
 </html>

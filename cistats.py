@@ -1,6 +1,8 @@
 from flask import Flask, render_template
 import hglib
 from datetime import datetime
+import xmlrpclib
+import re
 
 app = Flask(__name__)
 hglib.HGPATH = '/usr/local/bin/hg'
@@ -36,13 +38,23 @@ def get_commits(repo, user):
     return [{'desc': r[5], 'dt': r[6], 'hash': r[1]} for r in revs]
 
 
-def remove_repeated(cs1, cs2):
-    cs1_old = cs1
-    cs1 = []
-    for c1 in cs1_old:
-        if not any(c1['desc'] == c2['desc'] for c2 in cs2):
-            cs1.append(c1)
-    return cs1
+def get_patchbombed(user):
+    rpc = xmlrpclib.Server('http://patchwork.serpentine.com/xmlrpc/')
+    person_id = rpc.person_list(user, 0)[0]['id']
+    state_id = rpc.state_list('New', 0)[0]['id']
+    patches = rpc.patch_list({'submitter_id': person_id, 'state_id': state_id})
+    return [{'desc': re.sub(r'^\[.*?\]\s*', '', p['name'])} for p in patches]
+
+
+def commit_in(ci, cis):
+    lst = [c for c in cis if c['desc'].splitlines()[0] == ci['desc'].splitlines()[0]]
+    if lst:
+        if 'hash' in lst[0]:
+            return lst[0]['hash']
+        else:
+            return True
+    else:
+        return False
 
 
 @app.route('/')
@@ -50,10 +62,31 @@ def index():
     user = 'me@aplavin.ru'
 
     commits = {rid: get_commits(repos[rid], user) for rid in repos}
-    for i, rid in list(enumerate(repos_order))[:0:-1]:
-        commits[rid] = remove_repeated(commits[rid], commits[repos_order[i - 1]])
+    commits['pbomb'] = get_patchbombed(user)
 
-    return render_template('index.html', commits=commits, repos=repos)
+    my_commits = [
+        (
+            ci,
+            [
+                (
+                    rid,
+                    commit_in(ci, commits[rid])
+                )
+                for rid in commits if commit_in(ci, commits[rid])
+            ]
+        )
+        for ci in commits['mine']
+    ]
+
+    not_accepted_cnt = len([c for c, crepos in my_commits if len(crepos) == 1])
+    commit_cnts = {rid: len(commits[rid]) for rid in commits}
+    commit_cnts['not_accepted'] = not_accepted_cnt
+
+    return render_template(
+        'index.html',
+        commits=my_commits,
+        commit_cnts=commit_cnts,
+        repos=repos)
 
 
 repos = {
@@ -61,7 +94,6 @@ repos = {
     'crew': Repo('/home/alexander/hg_related/hg-crew', 'http://hg.intevation.org/mercurial/crew'),
     'mine': Repo('/home/alexander/hg_related/hg_fork', 'http://hg.aplavin.ru/hg_fork'),
 }
-repos_order = ['main', 'crew', 'mine']
 
 app.jinja_env.filters['timedelta'] = timesince
 if __name__ == '__main__':
