@@ -62,7 +62,7 @@ def index():
     user = 'me@aplavin.ru'
 
     commits = {rid: get_commits(repos[rid], user) for rid in repos}
-    commits['pbomb'] = get_patchbombed(user)
+    commits['pbomb'] = [ci for ci in get_patchbombed(user) if commit_in(ci, commits['mine'])]
 
     my_commits = [
         (
