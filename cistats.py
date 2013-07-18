@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import hglib
 from datetime import datetime
 import xmlrpclib
@@ -84,9 +84,12 @@ def index():
 
     return render_template(
         'index.html',
+        all_commits=commits,
         commits=my_commits,
         commit_cnts=commit_cnts,
-        repos=repos)
+        repos=repos,
+        debug='debug' in request.args
+    )
 
 
 repos = {
