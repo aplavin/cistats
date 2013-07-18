@@ -78,9 +78,8 @@ def index():
         for ci in commits['mine']
     ]
 
-    not_accepted_cnt = len([c for c, crepos in my_commits if len(crepos) == 1])
     commit_cnts = {rid: len(commits[rid]) for rid in commits}
-    commit_cnts['not_accepted'] = not_accepted_cnt
+    commit_cnts['not_accepted'] = len([c for c, crepos in my_commits if len(crepos) == 1])
 
     return render_template(
         'index.html',
