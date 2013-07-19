@@ -25,7 +25,7 @@
     {% if debug %}
         <ul>
             {% for ci in all_commits[repo] %}
-                <li>{{ ci.desc.splitlines()[0] }}</li>
+                <li>{{ ci.desc | firstline }}</li>
             {% endfor %}
         </ul>
     {% endif %}
@@ -63,7 +63,7 @@ Total: {{ show_ci_num(commit_cnts['mine']) }}
     {% for commit, cirepos in commits %}
         <li>
             {{ show_repos_badge(cirepos) }}
-            <a href="{{ repos['mine'].url }}/rev/{{ commit.hash }}">{{ commit.desc.splitlines()[0] }}</a>
+            <a href="{{ repos['mine'].url }}/rev/{{ commit.hash }}">{{ commit.desc | firstline }}</a>
             ({{ commit.dt | timedelta }})
         </li>
     {% endfor %}

@@ -96,5 +96,7 @@ repos = {
 }
 
 app.jinja_env.filters['timedelta'] = timesince
+app.jinja_env.filters['firstline'] = lambda s: (s.splitlines() + ['(none)'])[0]
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
