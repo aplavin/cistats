@@ -60,6 +60,7 @@
 <hr/>
 
 <h3>Legend</h3>
+<span style="font-weight: bold;">bold</span> revision which is currently ran at hg.aplavin.ru<br/>
 <span class="badge badge-success">&nbsp;</span> accepted to the main Mercurial repo &mdash; {{ show_ci_num(commit_cnts['main']) }}<br/>
 {{ show_ci_names('main') }}
 <span class="badge badge-info">&nbsp;</span> accepted to the crew repo (but not to the main one) &mdash; {{ show_ci_num(commit_cnts['crew']) }}<br/>
@@ -79,15 +80,15 @@ Total: {{ show_ci_num(commit_cnts['mine']) }}
 
 <hr/>
 
-<ul>
-    {% for commit, cirepos in commits %}
-        <li>
-            {{ show_repos_badge(cirepos) }}
-            <a href="{{ repos['mine'].url }}/rev/{{ commit.hash }}">{{ commit.desc | firstline }}</a>
-            ({{ commit.dt | timedelta }})
-        </li>
+<div>
+    {% for commit, cirepos, flags in commits %}
+        {{ show_repos_badge(cirepos) }}
+        <span style="{{ 'font-weight: bold;' if 'active' in flags else '' }}">
+            <a href="{{ repos['mine'].url }}/rev/{{ commit.hash }}">{{ commit.desc | firstline }}</a> ({{ commit.dt | timedelta }})
+        </span>
+        <br/>
     {% endfor %}
-</ul>
+</div>
 <hr/>
 
 Looking for source code? <a href="http://hg.aplavin.ru/cistats/">hg.aplavin.ru/cistats</a>.

@@ -35,12 +35,14 @@ class Repo(object):
 def get_commits(repo, user):
     with hglib.open(repo.path) as client:
         revs = client.log(user=user)
+        active_rev_hash = client.summary()['parent'][0][1]
 
     return [
         {
             'desc': r[5],
             'dt': r[6],
             'hash': r[1],
+            'active': r[1].startswith(active_rev_hash),
         }
         for r in revs
     ]
@@ -93,13 +95,14 @@ def index():
                 for rid in commits
                 if commit_in(ci, commits[rid])
             ],
+            ['active'] if ci['active'] else [],
         )
         for ci in commits['mine']
     ]
 
     commit_cnts = {rid: len(commits[rid]) for rid in commits}
     commit_cnts['crew'] -= commit_cnts['main']
-    commit_cnts['not_accepted'] = len([c for c, crepos in my_commits if len(crepos) == 1])
+    commit_cnts['not_accepted'] = len([c for c, crepos, flags in my_commits if len(crepos) == 1])
 
     return render_template(
         'index.html',
