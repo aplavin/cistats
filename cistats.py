@@ -35,7 +35,15 @@ class Repo(object):
 def get_commits(repo, user):
     with hglib.open(repo.path) as client:
         revs = client.log(user=user)
-    return [{'desc': r[5], 'dt': r[6], 'hash': r[1]} for r in revs]
+
+    return [
+        {
+            'desc': r[5],
+            'dt': r[6],
+            'hash': r[1],
+        }
+        for r in revs
+    ]
 
 
 def get_patchbombed(user):
@@ -43,11 +51,20 @@ def get_patchbombed(user):
     person_id = rpc.person_list(user, 0)[0]['id']
     state_id = rpc.state_list('New', 0)[0]['id']
     patches = rpc.patch_list({'submitter_id': person_id, 'state_id': state_id})
-    return [{'desc': re.sub(r'^\[.*?\]\s*', '', p['name'])} for p in patches]
+    return [
+        {
+            'desc': re.sub(r'^\[.*?\]\s*', '', p['name'])
+        }
+        for p in patches
+    ]
 
 
 def commit_in(ci, cis):
-    lst = [c for c in cis if c['desc'].splitlines()[0] == ci['desc'].splitlines()[0]]
+    lst = [
+        c
+        for c in cis
+        if c['desc'].splitlines()[0] == ci['desc'].splitlines()[0]
+    ]
     if lst:
         if 'hash' in lst[0]:
             return lst[0]['hash']
@@ -62,7 +79,11 @@ def index():
     user = 'me@aplavin.ru'
 
     commits = {rid: get_commits(repos[rid], user) for rid in repos}
-    commits['pbomb'] = [ci for ci in get_patchbombed(user) if commit_in(ci, commits['mine'])]
+    commits['pbomb'] = [
+        ci
+        for ci in get_patchbombed(user)
+        if commit_in(ci, commits['mine'])
+    ]
 
     my_commits = [
         (
@@ -71,7 +92,7 @@ def index():
                 rid
                 for rid in commits
                 if commit_in(ci, commits[rid])
-            ]
+            ],
         )
         for ci in commits['mine']
     ]
