@@ -8,21 +8,21 @@
     {% endif %}
 {% endmacro %}
 
-{% macro label_class(repo) %}
+{% macro badge_class(repo) %}
     {% if repo == 'main' %}
-        label-success
+        badge-success
     {% elif repo == 'crew' %}
-        label-info
+        badge-info
     {% elif repo == 'pbomb' %}
-        label-warning
+        badge-warning
     {% endif %}
 {% endmacro %}
 
 {% macro show_cirepos(cirepos) %}
     {% for repo, hash in cirepos if repo != 'mine' %}
-        <a class="label {{ label_class(repo) }}" href="{{ repos[repo].url if repo in repos else '' }}/rev/{{ hash }}">{{ repo }}</a>
+        <a class="badge {{ badge_class(repo) }}" href="{{ repos[repo].url if repo in repos else '' }}/rev/{{ hash }}">&nbsp;</a>
     {% else %}
-        <span class="label label-default">none</span>
+        <span class="badge badge-default">&nbsp;</span>
     {% endfor %}
 {% endmacro %}
 
@@ -53,13 +53,13 @@
 <hr/>
 
 <h3>Legend</h3>
-<span class="label label-success">main</span> accepted to the main Mercurial repo &mdash; {{ show_ci_num(commit_cnts['main']) }}<br/>
+<span class="badge badge-success">&nbsp;</span> accepted to the main Mercurial repo &mdash; {{ show_ci_num(commit_cnts['main']) }}<br/>
 {{ show_ci_names('main') }}
-<span class="label label-info">crew</span> accepted to the crew repo &mdash; {{ show_ci_num(commit_cnts['crew']) }}<br/>
+<span class="badge badge-info">&nbsp;</span> accepted to the crew repo &mdash; {{ show_ci_num(commit_cnts['crew']) }}<br/>
 {{ show_ci_names('crew') }}
-<span class="label label-warning">pbomb</span> patchbombed ('New' state) &mdash; {{ show_ci_num(commit_cnts['pbomb']) }}<br/>
+<span class="badge badge-warning">&nbsp;</span> patchbombed ('New' state) &mdash; {{ show_ci_num(commit_cnts['pbomb']) }}<br/>
 {{ show_ci_names('pbomb') }}
-<span class="label label-default">none</span> other &mdash; {{ show_ci_num(commit_cnts['not_accepted']) }}<br/>
+<span class="badge badge-default">&nbsp;</span> other &mdash; {{ show_ci_num(commit_cnts['not_accepted']) }}<br/>
 {{ show_ci_names('mine') }}
 Total: {{ show_ci_num(commit_cnts['mine']) }}
 <hr/>
