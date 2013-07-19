@@ -68,11 +68,9 @@ def index():
         (
             ci,
             [
-                (
-                    rid,
-                    commit_in(ci, commits[rid])
-                )
-                for rid in commits if commit_in(ci, commits[rid])
+                rid
+                for rid in commits
+                if commit_in(ci, commits[rid])
             ]
         )
         for ci in commits['mine']

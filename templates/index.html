@@ -8,22 +8,17 @@
     {% endif %}
 {% endmacro %}
 
-{% macro badge_class(repo) %}
-    {% if repo == 'main' %}
-        badge-success
-    {% elif repo == 'crew' %}
-        badge-info
-    {% elif repo == 'pbomb' %}
-        badge-warning
-    {% endif %}
-{% endmacro %}
-
-{% macro show_cirepos(cirepos) %}
-    {% for repo, hash in cirepos if repo != 'mine' %}
-        <a class="badge {{ badge_class(repo) }}" href="{{ repos[repo].url if repo in repos else '' }}/rev/{{ hash }}">&nbsp;</a>
+{% macro show_repos_badge(cirepos) %}
+    {% if 'main' in cirepos %}
+        {% set bclass = 'success' %}
+    {% elif 'crew' in cirepos %}
+        {% set bclass = 'info' %}
+    {% elif 'pbomb' in cirepos %}
+        {% set bclass = 'warning' %}
     {% else %}
-        <span class="badge badge-default">&nbsp;</span>
-    {% endfor %}
+        {% set bclass = 'default' %}
+    {% endif %}
+    <span class="badge badge-{{ bclass }}">&nbsp;</span>
 {% endmacro %}
 
 {% macro show_ci_names(repo) %}
@@ -55,7 +50,7 @@
 <h3>Legend</h3>
 <span class="badge badge-success">&nbsp;</span> accepted to the main Mercurial repo &mdash; {{ show_ci_num(commit_cnts['main']) }}<br/>
 {{ show_ci_names('main') }}
-<span class="badge badge-info">&nbsp;</span> accepted to the crew repo &mdash; {{ show_ci_num(commit_cnts['crew']) }}<br/>
+<span class="badge badge-info">&nbsp;</span> accepted to the crew repo (but not to the main one) &mdash; {{ show_ci_num(commit_cnts['crew']) }}<br/>
 {{ show_ci_names('crew') }}
 <span class="badge badge-warning">&nbsp;</span> patchbombed ('New' state) &mdash; {{ show_ci_num(commit_cnts['pbomb']) }}<br/>
 {{ show_ci_names('pbomb') }}
@@ -67,7 +62,7 @@ Total: {{ show_ci_num(commit_cnts['mine']) }}
 <ul>
     {% for commit, cirepos in commits %}
         <li>
-            {{ show_cirepos(cirepos) }}
+            {{ show_repos_badge(cirepos) }}
             <a href="{{ repos['mine'].url }}/rev/{{ commit.hash }}">{{ commit.desc.splitlines()[0] }}</a>
             ({{ commit.dt | timedelta }})
         </li>
