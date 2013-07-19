@@ -8,13 +8,25 @@
     {% endif %}
 {% endmacro %}
 
+{% macro repo_class(repo) -%}
+    {% if repo == 'main' -%}
+        success
+    {%- elif repo == 'crew' -%}
+        info
+    {%- elif repo == 'pbomb' -%}
+        warning
+    {%- else -%}
+        default
+    {%- endif -%}
+{%- endmacro %}
+
 {% macro show_repos_badge(cirepos) %}
     {% if 'main' in cirepos %}
-        {% set bclass = 'success' %}
+        {% set bclass = repo_class('main') %}
     {% elif 'crew' in cirepos %}
-        {% set bclass = 'info' %}
+        {% set bclass = repo_class('crew') %}
     {% elif 'pbomb' in cirepos %}
-        {% set bclass = 'warning' %}
+        {% set bclass = repo_class('pbomb') %}
     {% else %}
         {% set bclass = 'default' %}
     {% endif %}
@@ -57,6 +69,14 @@
 <span class="badge badge-default">&nbsp;</span> other &mdash; {{ show_ci_num(commit_cnts['not_accepted']) }}<br/>
 {{ show_ci_names('mine') }}
 Total: {{ show_ci_num(commit_cnts['mine']) }}
+
+<div class="progress">
+    {% for repo in ['main', 'crew', 'pbomb'] %}
+        {% set percent = 100 * commit_cnts[repo] / commit_cnts['mine'] %}
+        <div class="bar bar-{{ repo_class(repo) }}" style="width: {{ percent }}%;"></div>
+    {% endfor %}
+</div>
+
 <hr/>
 
 <ul>

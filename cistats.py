@@ -77,6 +77,7 @@ def index():
     ]
 
     commit_cnts = {rid: len(commits[rid]) for rid in commits}
+    commit_cnts['crew'] -= commit_cnts['main']
     commit_cnts['not_accepted'] = len([c for c, crepos in my_commits if len(crepos) == 1])
 
     return render_template(
@@ -95,6 +96,7 @@ repos = {
     'mine': Repo('/home/alexander/hg_related/hg_fork', 'http://hg.aplavin.ru/hg_fork'),
 }
 
+app.jinja_env.trim_blocks = True
 app.jinja_env.filters['timedelta'] = timesince
 app.jinja_env.filters['firstline'] = lambda s: (s.splitlines() + ['(none)'])[0]
 
